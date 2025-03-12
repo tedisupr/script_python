@@ -1,63 +1,74 @@
 import os
 import fitz  # PyMuPDF untuk membaca PDF
 import win32file  # Untuk menangani path panjang di Windows
+import re  # Untuk membersihkan karakter tidak valid
 
-# Baca halaman pertama PDF untuk mengambil judul.
-# Bersihkan judul agar cocok untuk nama file.
-# Rename file PDF dengan format: NamaFileLama $ JudulDariPDF.pdf
+# Karakter yang tidak diperbolehkan dalam nama file Windows
+INVALID_CHARS = r'[<>:"/\\|?*]'
+
+def clean_filename(filename):
+    """Bersihkan karakter tidak valid dalam nama file dan hilangkan spasi/titik di akhir."""
+    cleaned = re.sub(INVALID_CHARS, " ", filename)  # Hapus karakter ilegal
+    cleaned = " ".join(cleaned.split()).strip()  # Hapus spasi ganda
+    return cleaned.rstrip(" .")  # Pastikan tidak diakhiri spasi atau titik
 
 def extract_title_from_pdf(pdf_path):
-    """Ekstrak judul dari halaman pertama PDF dan normalisasi formatnya"""
-    doc = fitz.open(pdf_path)
-    text = doc[0].get_text("text")
-    lines = [line.strip() for line in text.split("\n") if line.strip()]
+    """Ekstrak judul dari halaman pertama PDF"""
+    try:
+        with fitz.open(pdf_path) as doc:
+            text = doc[0].get_text("text")
+    except Exception:
+        return "untitled"
 
-    # Ambil maksimal 3 baris pertama sebagai judul
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
     title = " ".join(lines[:4]) if lines else "untitled"
 
-    # Bersihkan karakter yang tidak valid dalam nama file Windows
-    title = "".join(c if c.isalnum() or c in " _-()" else "_" for c in title).strip()
-
-    # Normalisasi format (Mengembalikan _ menjadi ())
-    title = title.replace("_", " ").replace("  ", " ")
-
-    return title
+    return clean_filename(title)  # Bersihkan nama judul
 
 def rename_pdfs_in_folder(folder_path):
-    """Rename semua PDF dalam folder dengan menggunakan Win32 API"""
+    """Rename semua file PDF dalam folder"""
     folder_path = os.path.abspath(folder_path)
-    long_folder_path = f"\\\\?\\{folder_path}"  # Tambahkan prefix \\?\ untuk menangani path panjang
+    long_folder_path = f"\\\\?\\{folder_path}"  # Gunakan path panjang
 
     pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith(".pdf")]
 
-    if not pdf_files:  # Jika tidak ada file PDF
-        print("⚠ Tidak ada file PDF yang ditemukan di dalam folder!")
-        return
+    if not pdf_files:
+        return  # Tidak ada file, keluar
 
     for filename in pdf_files:
         pdf_path = os.path.join(folder_path, filename)
-        long_pdf_path = f"\\\\?\\{pdf_path}"  # Path panjang untuk Windows API
+        long_pdf_path = f"\\\\?\\{pdf_path}"
 
-        # Ambil judul dari halaman pertama PDF
+        # Ambil judul dari PDF
         title = extract_title_from_pdf(long_pdf_path)
 
-        # Gabungkan nama file lama dengan nama baru
-        base_filename, _ = os.path.splitext(filename)  # Ambil nama tanpa ekstensi
-        new_filename = f"{base_filename} $ {title}.pdf" if title else f"{base_filename} $ untitled.pdf"
+        # Gabungkan nama file lama dengan judul PDF
+        base_filename, _ = os.path.splitext(filename)
+        base_filename = clean_filename(base_filename)
+        new_filename = f"{base_filename} $ {title}.pdf"
+
+        # Jika nama file terlalu panjang, persingkat
+        if len(new_filename) > 245:
+            new_filename = new_filename[:245] + ".pdf"
 
         new_path = os.path.join(folder_path, new_filename)
-        long_new_path = f"\\\\?\\{new_path}"  # Path panjang untuk tujuan rename
+        long_new_path = f"\\\\?\\{new_path}"
 
-        if os.path.exists(long_new_path):
-            print(f"⚠ File '{new_filename}' sudah ada. Lewati...")
-        else:
+        # Coba rename, jika gagal buat nama alternatif
+        try:
+            win32file.MoveFileEx(long_pdf_path, long_new_path, win32file.MOVEFILE_REPLACE_EXISTING)
+            print(f"✅ '{filename}' berhasil diubah menjadi '{new_filename}'")
+        except:
+            # Jika masih gagal, coba nama lebih pendek
+            short_filename = f"{base_filename}.pdf"
+            short_new_path = os.path.join(folder_path, short_filename)
+            long_short_new_path = f"\\\\?\\{short_new_path}"
             try:
-                # Gunakan MoveFileEx untuk rename dengan path panjang
-                win32file.MoveFileEx(long_pdf_path, long_new_path, win32file.MOVEFILE_REPLACE_EXISTING)
-                print(f"✅ '{filename}' diubah menjadi '{new_filename}'")
-            except Exception as e:
-                print(f"❌ Gagal rename '{filename}': {e}")
+                win32file.MoveFileEx(long_pdf_path, long_short_new_path, win32file.MOVEFILE_REPLACE_EXISTING)
+                print(f"✅ '{filename}' berhasil diubah menjadi '{short_filename}' (nama dipersingkat)")
+            except:
+                pass  # Jika masih gagal, abaikan tanpa menampilkan error
 
-# Tentukan folder tempat file PDF berada
-folder = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\kti farmasi\KTI D III FARMASI TAHUN 2023"  # Ganti dengan path folder PDF kamu
+# Jalankan script
+folder = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\kti farmasi\FARMASI JURNAL BARU 2021\Softfile Tk.3 2021\gabungan"
 rename_pdfs_in_folder(folder)
