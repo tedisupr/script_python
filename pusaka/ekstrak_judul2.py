@@ -4,7 +4,7 @@ import win32file  # Untuk menangani path panjang di Windows
 
 # Baca halaman pertama PDF untuk mengambil judul.
 # Bersihkan judul agar cocok untuk nama file.
-# Rename file PDF dengan format:
+# Rename file PDF dengan format: NamaFileLama $ JudulDariPDF.pdf
 
 def extract_title_from_pdf(pdf_path):
     """Ekstrak judul dari halaman pertama PDF dan normalisasi formatnya"""
