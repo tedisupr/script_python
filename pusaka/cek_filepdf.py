@@ -15,4 +15,4 @@ for pdf in pdf_files:
         reader.pages[0]  # Coba akses halaman pertama
         print(f"✅ File OK: {pdf}")
     except Exception as e:
-        print(f"❌ File rusak: {pdf} | Error: {e}");
+        print(f"❌ File rusak: {pdf} | Error: {e}")
