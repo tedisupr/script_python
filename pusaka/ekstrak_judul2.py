@@ -33,6 +33,7 @@ def rename_pdfs_in_folder(folder_path):
     pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith(".pdf")]
 
     if not pdf_files:
+        print("⚠ Tidak ada file PDF yang ditemukan!")
         return  # Tidak ada file, keluar
 
     for filename in pdf_files:
@@ -42,9 +43,23 @@ def rename_pdfs_in_folder(folder_path):
         # Ambil judul dari PDF
         title = extract_title_from_pdf(long_pdf_path)
 
-        # Gabungkan nama file lama dengan judul PDF
+        # Bersihkan nama file lama
         base_filename, _ = os.path.splitext(filename)
         base_filename = clean_filename(base_filename)
+
+        # **Hapus bagian "gabungan_Apotek - " jika ada**
+        if base_filename.startswith("gabungan_Lab. Kimia - "):
+            base_filename = base_filename.replace("gabungan_Lab. Kimia - ", "").strip()
+
+         # **Hapus bagian "gabungan_Apotek - " jika ada**
+        if base_filename.startswith("gabungan_Lab. TekFar - "):
+            base_filename = base_filename.replace("gabungan_Lab. TekFar - ", "").strip()
+        
+         # **Hapus bagian "gabungan_Apotek - " jika ada**
+        if base_filename.startswith("gabungan_Lab. Mikrobiologi - "):
+            base_filename = base_filename.replace("gabungan_Lab. Mikrobiologi - ", "").strip()
+
+        # Format nama baru dengan tambahan judul dari PDF
         new_filename = f"{base_filename} $ {title}.pdf"
 
         # Jika nama file terlalu panjang, persingkat
@@ -67,8 +82,9 @@ def rename_pdfs_in_folder(folder_path):
                 win32file.MoveFileEx(long_pdf_path, long_short_new_path, win32file.MOVEFILE_REPLACE_EXISTING)
                 print(f"✅ '{filename}' berhasil diubah menjadi '{short_filename}' (nama dipersingkat)")
             except:
+                print(f"❌ Gagal mengubah nama '{filename}', file tetap seperti semula.")
                 pass  # Jika masih gagal, abaikan tanpa menampilkan error
 
 # Jalankan script
-folder = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\kti farmasi\FARMASI JURNAL BARU 2021\Softfile Tk.3 2021\gabungan"
+folder = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\kti farmasi\FARMASI JURNAL BARU 2021\Softfile Tk.3 2021"
 rename_pdfs_in_folder(folder)
