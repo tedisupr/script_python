@@ -8,7 +8,7 @@ import fitz  # PyMuPDF
 # Tidak menimpa file gabungan yang sudah ada.
 
 # Folder utama tempat file PDF berada
-folder_pdf = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\kti farmasi2\FARMASI JURNAL BARU 2021\Softfile Tk.3 2021"
+folder_pdf = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\KTI PERAWAT"
 
 # Folder utama tempat menyimpan hasil
 output_folder = folder_pdf  # Simpan hasil di main folder

@@ -2,10 +2,7 @@ import os
 
 def rename_pdfs_in_folder(folder_path):
     """Rename file PDF dengan aturan:
-    1. Hapus 18 karakter pertama dari kiri (jika ada).
-    2. Hapus semua karakter dari '$' ke kanan (termasuk '$').
-    3. Hapus karakter sebelum dan termasuk '-' pertama (jika ada).
-    4. Hapus kata 'gabungan_Apotek - ' jika ada di awal nama file.
+    1. Hapus semua karakter dari '$' ke kiri (termasuk '$').
     """
     folder_path = os.path.abspath(folder_path)
     pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith(".pdf")]
@@ -16,29 +13,16 @@ def rename_pdfs_in_folder(folder_path):
 
     for filename in pdf_files:
         old_path = os.path.join(folder_path, filename)
-
-        # Awali dengan nama file asli untuk memastikan new_name selalu ada
+        
+        # Awali dengan nama file asli
         new_name = filename  
 
-        # # Hapus 18 karakter pertama (jika ada)
-        # if len(new_name) > 18:
-        #     new_name = new_name[18:]
-
-        # # Hapus karakter sebelum dan termasuk '-' pertama (jika ada)
-        # if "-" in new_name:
-        #     new_name = new_name.split("-", 1)[-1].strip()
-
-        # # Hapus semua dari karakter '$' ke kanan (termasuk '$')
-        # if "$" in new_name:
-        #     new_name = new_name.split("$")[0].strip()
-
-        # Hapus "gabungan_Apotek - " jika ada di awal nama file
-        if new_name.startswith("gabungan_Apotek - "):
-            new_name = new_name.replace("gabungan_Apotek - ", "", 1)
+        # Hapus semua karakter dari '$' ke kiri (termasuk '$')
+        if "$" in new_name:
+            new_name = new_name.split("$")[-1].strip()
 
         # Tambahkan kembali ekstensi .pdf
         new_name = new_name.strip() + ".pdf"
-
         new_path = os.path.join(folder_path, new_name)
 
         # Cek jika nama baru sama atau sudah ada

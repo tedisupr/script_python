@@ -86,5 +86,5 @@ def rename_pdfs_in_folder(folder_path):
                 pass  # Jika masih gagal, abaikan tanpa menampilkan error
 
 # Jalankan script
-folder = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\kti farmasi\FARMASI JURNAL BARU 2021\Softfile Tk.3 2021"
+folder = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\KTI PERAWAT"
 rename_pdfs_in_folder(folder)
