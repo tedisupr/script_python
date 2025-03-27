@@ -1,73 +1,81 @@
+# konversi file ke pdf
 import os
 import time
 import win32com.client
 from pathlib import Path
 
-def restart_powerpoint():
-    """Tutup semua instance PowerPoint sebelum memulai"""
+def restart_office_apps():
+    """Tutup semua instance PowerPoint, Word, dan Excel jika sedang berjalan"""
+    apps = ["POWERPNT.EXE", "WINWORD.EXE", "EXCEL.EXE"]
+    for app in apps:
+        running = os.popen(f'tasklist | findstr {app}').read()
+        if app in running:
+            print(f"🔄 Menutup {app} yang sedang berjalan...")
+            os.system(f"taskkill /F /IM {app}")
+            time.sleep(2)  # Tunggu sebentar sebelum melanjutkan
+        else:
+            print(f"✅ Tidak ada {app} yang berjalan.")
+
+def convert_office_to_pdf(file_path, pdf_path):
+    """Konversi file Office (PowerPoint, Word, Excel, RTF) ke PDF"""
+    ext = file_path.suffix.lower()
+    
+    if file_path.name.startswith("~$"):
+        print(f"⚠️ Lewati file temporary: {file_path}")
+        return  # Lewati file temporary dari Microsoft Office
+    
     try:
-        os.system("taskkill /F /IM POWERPNT.EXE")
-        time.sleep(2)  # Tunggu sebelum melanjutkan
-    except:
-        pass  # Abaikan jika tidak ada PowerPoint yang berjalan
-
-def convert_powerpoint_to_pdf(file_path, pdf_path):
-    """Konversi PowerPoint ke PDF dengan penanganan error"""
-    try:
-        ppt = win32com.client.Dispatch("PowerPoint.Application")
-        ppt.Visible = 1  # Pastikan PowerPoint berjalan
-
-        # Buka presentasi dalam mode Read-Only
-        presentation = ppt.Presentations.Open(file_path, WithWindow=False, ReadOnly=True)
-
-        # Tunggu beberapa detik untuk stabilitas
-        time.sleep(2)
-
-        # Coba simpan ulang ke PPTX jika terjadi masalah
-        temp_pptx_path = str(Path(file_path).with_suffix(".temp.pptx"))
-        presentation.SaveAs(temp_pptx_path, 24)  # 24 = ppSaveAsOpenXMLPresentation (PPTX)
-        presentation.Close()
+        if ext in [".ppt", ".pptx"]:
+            print(f"🚀 Mengonversi PowerPoint: {file_path} -> {pdf_path}")
+            app = win32com.client.Dispatch("PowerPoint.Application")
+            app.Visible = 1
+            presentation = app.Presentations.Open(str(file_path), WithWindow=False, ReadOnly=True)
+            presentation.SaveAs(str(pdf_path), 32)  # 32 = Save as PDF
+            presentation.Close()
+            app.Quit()
         
-        # Buka ulang file yang sudah disimpan ulang
-        presentation = ppt.Presentations.Open(temp_pptx_path, WithWindow=False, ReadOnly=True)
-
-        # Simpan ke PDF
-        presentation.SaveAs(pdf_path, 32)  # 32 = ppSaveAsPDF
-        presentation.Close()
-
-        # Hapus file sementara
-        os.remove(temp_pptx_path)
-        os.remove(file_path)  # Hapus file asli setelah konversi
-        print(f"✅ PowerPoint: '{os.path.basename(file_path)}' -> PDF (File asli dihapus)")
-
+        elif ext in [".doc", ".docx", ".rtf"]:
+            print(f"🚀 Mengonversi Word/RTF: {file_path} -> {pdf_path}")
+            app = win32com.client.Dispatch("Word.Application")
+            app.Visible = False
+            try:
+                doc = app.Documents.Open(str(file_path), ReadOnly=True)
+                doc.SaveAs(str(pdf_path), 17)  # 17 = Save as PDF
+                doc.Close()
+            except Exception as e:
+                print(f"❌ Gagal membuka Word/RTF: {file_path} -> {e}")
+            app.Quit()
+            
+        elif ext in [".xls", ".xlsx"]:
+            print(f"🚀 Mengonversi Excel: {file_path} -> {pdf_path}")
+            app = win32com.client.Dispatch("Excel.Application")
+            app.Visible = False
+            try:
+                wb = app.Workbooks.Open(str(file_path), ReadOnly=True)
+                wb.ExportAsFixedFormat(0, str(pdf_path))  # 0 = Save as PDF
+                wb.Close()
+            except Exception as e:
+                print(f"❌ Gagal membuka Excel: {file_path} -> {e}")
+            app.Quit()
+        
+        print(f"✅ Berhasil: {file_path} -> {pdf_path}")
+    
     except Exception as e:
-        print(f"❌ Gagal mengonversi PowerPoint '{file_path}': {e}")
-
-    finally:
-        ppt.Quit()  # Pastikan PowerPoint ditutup setelah konversi
+        print(f"❌ Gagal mengonversi {file_path}: {e}")
 
 def convert_all_non_pdf_to_pdf(folder_path):
-    """Konversi semua file non-PDF di dalam folder dan subfolder menjadi PDF jika belum ada file PDF"""
-    folder_path = os.path.abspath(folder_path)
+    """Konversi semua file non-PDF di dalam folder dan subfolder"""
+    folder_path = Path(folder_path).resolve()
+    
+    restart_office_apps()
+    
+    for file_path in folder_path.rglob("*.*"):  # Scan semua file dalam folder dan subfolder
+        if file_path.suffix.lower() == ".pdf":
+            continue  # Lewati file PDF
+        
+        pdf_path = file_path.with_suffix(".pdf")
+        convert_office_to_pdf(file_path, pdf_path)
 
-    # Restart PowerPoint sebelum mulai
-    restart_powerpoint()
-
-    for root, _, files in os.walk(folder_path):
-        pdf_files = [f for f in files if f.lower().endswith(".pdf")]
-
-        for filename in files:
-            if filename.lower().endswith(".pdf"):
-                continue  # Lewati file PDF yang sudah ada
-
-            file_path = os.path.join(root, filename)
-            pdf_path = os.path.splitext(file_path)[0] + ".pdf"
-
-            ext = filename.lower().split(".")[-1]
-
-            if ext in ["ppt", "pptx"]:
-                convert_powerpoint_to_pdf(file_path, pdf_path)
-
-# Tentukan folder tempat file berada
-folder = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\kti farmasi2\FARMASI JURNAL BARU 2021\Softfile Tk.3 2021"
+# Jalankan konversi
+folder = Path(r"D:\\Technical Support\\Service\\E-Library\\Poltekes TNI AU\\KTI PERAWAT")
 convert_all_non_pdf_to_pdf(folder)
