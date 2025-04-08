@@ -6,10 +6,10 @@ import fitz  # PyMuPDF untuk membaca & memperbaiki PDF
 from PyPDF2 import PdfReader
 
 # Path ke file Excel
-excel_path = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\kti farmasi\FARMASI JURNAL BARU 2021\Softfile Tk.3 2021\gabungan\rename_file.xlsx"
+excel_path = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\KTI PERAWAT\rename.xlsx"
 
 # Path ke folder tempat file PDF berada
-folder_path = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\kti farmasi\FARMASI JURNAL BARU 2021\Softfile Tk.3 2021\gabungan"
+folder_path = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\KTI PERAWAT"
 
 # Cek apakah folder ada
 if not os.path.exists(folder_path):

@@ -1,8 +1,8 @@
 import os
 
-def rename_pdfs_in_folder(folder_path):
+def rename_pdfs_in_folder(folder_path, keyword):
     """Rename file PDF dengan aturan:
-    1. Hapus semua karakter dari '$' ke kiri (termasuk '$').
+    1. Hapus kata kunci tertentu dalam nama file.
     """
     folder_path = os.path.abspath(folder_path)
     pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith(".pdf")]
@@ -15,14 +15,10 @@ def rename_pdfs_in_folder(folder_path):
         old_path = os.path.join(folder_path, filename)
         
         # Awali dengan nama file asli
-        new_name = filename  
-
-        # Hapus semua karakter dari '$' ke kiri (termasuk '$')
-        if "$" in new_name:
-            new_name = new_name.split("$")[-1].strip()
+        new_name = filename.replace(keyword, "").strip()
 
         # Tambahkan kembali ekstensi .pdf
-        new_name = new_name.strip() + ".pdf"
+        new_name = new_name + ".pdf"
         new_path = os.path.join(folder_path, new_name)
 
         # Cek jika nama baru sama atau sudah ada
@@ -36,6 +32,7 @@ def rename_pdfs_in_folder(folder_path):
         except Exception as e:
             print(f"❌ Gagal rename '{filename}': {e}")
 
-# Tentukan folder tempat file PDF berada
+# Tentukan folder tempat file PDF berada dan kata kunci yang ingin dihapus
 folder = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\KTI PERAWAT"  # Ganti dengan path folder
-rename_pdfs_in_folder(folder)
+keyword = ".pdf"  # Ganti dengan kata kunci yang ingin dihapus
+rename_pdfs_in_folder(folder, keyword)
