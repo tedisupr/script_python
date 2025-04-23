@@ -1,6 +1,8 @@
 import os
 import re
 
+# Merapihkan nama file pdf
+
 # Ganti ini dengan folder tempat file PDF kamu berada
 folder_path = "D:\Technical Support\Service\E-Library\Poltekes TNI AU\ebook keperawatan\ebook perawat-20250423T153045Z-001 23-04-2025"
 
