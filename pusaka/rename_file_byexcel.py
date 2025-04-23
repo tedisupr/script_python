@@ -5,6 +5,8 @@ import difflib
 import fitz  # PyMuPDF untuk membaca & memperbaiki PDF
 from PyPDF2 import PdfReader
 
+# rename file pdf bersumber dari data excel
+
 # Path ke file Excel
 excel_path = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\KTI PERAWAT\rename.xlsx"
 
