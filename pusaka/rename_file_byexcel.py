@@ -8,10 +8,10 @@ from PyPDF2 import PdfReader
 # rename file pdf bersumber dari data excel
 
 # Path ke file Excel
-excel_path = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\KTI PERAWAT\rename.xlsx"
+excel_path = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\ebook keperawatan\ebook perawat-20250423T153045Z-001 23-04-2025\rename.xlsx"
 
 # Path ke folder tempat file PDF berada
-folder_path = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\KTI PERAWAT"
+folder_path = r"D:\Technical Support\Service\E-Library\Poltekes TNI AU\ebook keperawatan\ebook perawat-20250423T153045Z-001 23-04-2025"
 
 # Cek apakah folder ada
 if not os.path.exists(folder_path):
