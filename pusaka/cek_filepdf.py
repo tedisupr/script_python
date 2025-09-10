@@ -14,6 +14,7 @@ pdf_files = [f for f in os.listdir(folder_pdf) if f.endswith('.pdf')]
 # Counter hasil pengecekan
 ok_count = 0
 bad_count = 0
+bad_files = []  # simpan nama file rusak
 
 # Cek satu per satu apakah bisa dibuka
 for pdf in pdf_files:
@@ -26,9 +27,16 @@ for pdf in pdf_files:
     except Exception as e:
         print(f"❌ File rusak: {pdf} | Error: {e}")
         bad_count += 1
+        bad_files.append(pdf)
 
 # Tampilkan ringkasan
 print("\n===== RINGKASAN HASIL CEK PDF =====")
 print(f"Total file dicek : {len(pdf_files)}")
 print(f"✅ File OK       : {ok_count}")
 print(f"❌ File rusak    : {bad_count}")
+
+# Jika ada file rusak, tampilkan daftarnya
+if bad_files:
+    print("\nDaftar file rusak:")
+    for f in bad_files:
+        print(f"- {f}")
