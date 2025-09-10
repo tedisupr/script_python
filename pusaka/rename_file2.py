@@ -1,5 +1,7 @@
 import os
 
+# rename file PDF yang punya karakter $ di namanya
+
 def rename_pdfs_in_folder(folder_path):
     """Rename file PDF dengan aturan:
     1. Hapus semua karakter dari '$' ke kiri (termasuk '$').

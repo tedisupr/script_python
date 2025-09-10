@@ -2,6 +2,11 @@ import os
 import fitz  # PyMuPDF untuk membaca PDF
 import win32file  # Untuk menangani path panjang di Windows
 
+# Fungsi dari script ini
+# Membaca judul halaman pertama PDF.
+# Menjadikannya nama file baru.
+# Rename file PDF otomatis, dengan dukungan long path di Windows.
+
 def extract_title_from_pdf(pdf_path):
     """Ekstrak judul dari halaman pertama PDF dan normalisasi formatnya"""
     doc = fitz.open(pdf_path)

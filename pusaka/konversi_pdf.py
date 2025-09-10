@@ -4,6 +4,8 @@ import time
 import win32com.client
 from pathlib import Path
 
+# script untuk mengonversi file Microsoft Office (Word, Excel, PowerPoint, juga RTF) menjadi PDF secara otomatis dalam sebuah folder (termasuk subfolder).
+
 def restart_office_apps():
     """Tutup semua instance PowerPoint, Word, dan Excel jika sedang berjalan"""
     apps = ["POWERPNT.EXE", "WINWORD.EXE", "EXCEL.EXE"]

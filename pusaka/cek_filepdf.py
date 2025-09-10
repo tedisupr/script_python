@@ -2,6 +2,8 @@ import os
 from pypdf import PdfReader
 import logging
 
+# script untuk mengecek file pdf rusak atau tidak
+
 # Matikan warning/info dari pypdf
 logging.getLogger("pypdf").setLevel(logging.CRITICAL)
 

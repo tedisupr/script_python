@@ -1,5 +1,7 @@
 import os
 
+# fungsi script ini untuk me-rename file PDF di dalam suatu folder dengan cara menghapus kata kunci tertentu pada nama file.
+
 def rename_pdfs_in_folder(folder_path, keyword):
     """Rename file PDF dengan aturan:
     1. Hapus kata kunci tertentu dalam nama file.
